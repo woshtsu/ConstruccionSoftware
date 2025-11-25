@@ -1,0 +1,99 @@
+GET http://localhost:8080/api/v1/hola
+
+### Registrar proyecto (autoconstrucción)
+POST http://localhost:8080/api/v1/proyectos
+Content-Type: application/json
+
+{
+  "idCliente": "USU-01",
+  "titulo": "Remodelación Sala",
+  "descripcion": "Pared divisoria drywall",
+  "idAsesor": null
+}
+
+### Registrar proyecto (con asesor)
+POST http://localhost:8080/api/v1/proyectos
+Content-Type: application/json
+
+{
+  "idCliente": "USU-02",
+  "titulo": "Oficinas Administrativas",
+  "descripcion": "Cielo raso y divisiones",
+  "idAsesor": "ASE-01"
+}
+
+### Crear área de construcción
+POST http://localhost:8080/api/v1/areas
+Content-Type: application/json
+
+{
+  "idProyecto": "PROY-01",
+  "tipo": "Muro Divisorio",
+  "largo": 5.00,
+  "alto": 2.50,
+  "espesor": 0.12,
+  "superficie": 12.50,
+  "archivoImportado": null
+}
+
+### Crear proforma para proyecto
+POST http://localhost:8080/api/v1/proformas
+Content-Type: application/json
+
+{
+  "idProyecto": "PROY-01"
+}
+
+### Obtener proyecto por ID
+GET http://localhost:8080/api/v1/proyectos/PROY-01
+
+### Listar áreas por proyecto
+GET http://localhost:8080/api/v1/proyectos/PROY-01/areas
+
+### Listar proformas por proyecto
+GET http://localhost:8080/api/v1/proyectos/PROY-01/proformas
+
+### Obtener área por ID
+GET http://localhost:8080/api/v1/areas/AREA-01
+
+### Obtener proforma por ID
+GET http://localhost:8080/api/v1/proformas/PROF-01
+
+### Listar detalles de proforma
+GET http://localhost:8080/api/v1/proformas/PROF-01/detalles
+
+### Agregar detalle correcto (misma proforma y área del mismo proyecto)
+POST http://localhost:8080/api/v1/proformas/detalles
+Content-Type: application/json
+
+{
+  "idProforma": "PROF-01",
+  "idCotizacion": "COT-01",
+  "idAreaConstruccion": "AREA-01",
+  "cantidad": 10
+}
+
+### Agregar detalle inválido (violación de trigger)
+POST http://localhost:8080/api/v1/proformas/detalles
+Content-Type: application/json
+
+{
+  "idProforma": "PROF-01",
+  "idCotizacion": "COT-01",
+  "idAreaConstruccion": "AREA-02",
+  "cantidad": 1
+}
+
+### Comparar cotizaciones por material (ordenado por precio ascendente)
+GET http://localhost:8080/api/v1/materiales/MAT-01/cotizaciones
+
+### Actualizar precio de una cotización desde URL de producto (PDP)
+PUT http://localhost:8080/api/v1/cotizaciones/COT-01/precio
+Content-Type: application/json
+
+{
+  "url": "https://www.falabella.com.pe/falabella-pe/product/XXXX"
+}
+
+### Buscar productos en Falabella por término
+GET http://localhost:8080/api/v1/buscar?query=placa+drywall
