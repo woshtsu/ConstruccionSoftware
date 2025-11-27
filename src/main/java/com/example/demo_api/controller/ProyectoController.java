@@ -3,7 +3,10 @@ package com.example.demo_api.controller;
 import com.example.demo_api.dto.RegistrarProyectoRequest;
 import com.example.demo_api.dto.RegistrarProyectoResponse;
 import com.example.demo_api.service.ProyectoService;
+import com.example.demo_api.service.AuthService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +18,13 @@ public class ProyectoController {
     private final ProyectoService proyectoService;
     private final com.example.demo_api.service.AreaService areaService;
     private final com.example.demo_api.service.ProformaService proformaService;
+    private final AuthService authService;
 
-    public ProyectoController(ProyectoService proyectoService, com.example.demo_api.service.AreaService areaService, com.example.demo_api.service.ProformaService proformaService) {
+    public ProyectoController(ProyectoService proyectoService, com.example.demo_api.service.AreaService areaService, com.example.demo_api.service.ProformaService proformaService, AuthService authService) {
         this.proyectoService = proyectoService;
         this.areaService = areaService;
         this.proformaService = proformaService;
+        this.authService = authService;
     }
 
     @GetMapping(path = "/hola", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +33,14 @@ public class ProyectoController {
     }
 
     @PostMapping(path = "/proyectos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RegistrarProyectoResponse> registrarProyecto(@RequestBody RegistrarProyectoRequest request) {
+    public ResponseEntity<RegistrarProyectoResponse> registrarProyecto(@RequestBody RegistrarProyectoRequest request, HttpServletRequest http) {
+        if ((request.getIdCliente() == null || request.getIdCliente().isBlank())) {
+            String token = parseBearer(http.getHeader("Authorization"));
+            if (token != null) {
+                String id = authService.getClienteIdByToken(token);
+                if (id != null) request.setIdCliente(id);
+            }
+        }
         if (request.getIdCliente() == null || request.getIdCliente().isBlank() || request.getTitulo() == null || request.getTitulo().isBlank()) {
             return ResponseEntity.badRequest().body(new com.example.demo_api.dto.RegistrarProyectoResponse("Error", null, "idCliente y titulo son requeridos"));
         }
@@ -44,6 +56,13 @@ public class ProyectoController {
         var dto = proyectoService.obtenerPorId(id);
         if (dto == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(dto);
+    }
+
+    private String parseBearer(String authorization) {
+        if (authorization == null) return null;
+        String prefix = "Bearer ";
+        if (authorization.startsWith(prefix)) return authorization.substring(prefix.length());
+        return null;
     }
 
     @GetMapping(path = "/proyectos/{id}/areas", produces = MediaType.APPLICATION_JSON_VALUE)
