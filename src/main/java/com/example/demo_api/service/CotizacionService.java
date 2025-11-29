@@ -43,4 +43,12 @@ public class CotizacionService {
             return new com.example.demo_api.dto.CrearCotizacionResponse("Error", null, e.getMessage());
         }
     }
+
+    public java.util.List<com.example.demo_api.dto.CotizacionComparacionDTO> listarTodas() {
+        try {
+            return cotizacionDao.listarTodas();
+        } catch (Exception e) {
+            return java.util.List.of();
+        }
+    }
 }

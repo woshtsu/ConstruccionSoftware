@@ -65,6 +65,7 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
 
 - Cotizaciones
   - Propósito: comparar precios, actualizar precio vía scraping y crear cotizaciones
+  - Listar: `GET /cotizaciones`
   - Comparar por material: `GET /materiales/{id}/cotizaciones`
   - Actualizar precio: `PUT /cotizaciones/{id}/precio`
     - Request:
@@ -245,6 +246,14 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
     [ { "idMaterial": "MAT-XX", "titulo": "Placa Drywall 9mm", "precio": 25.5, "url": "https://www.falabella.com.pe/falabella-pe/product/XXXX" } ]
     ```
   - Nota: los materiales encontrados se registran en la tabla `Material` y devuelven `idMaterial` para que el frontend pueda operar (por ejemplo, crear cotizaciones con `idMaterial`).
+
+- `GET /cotizaciones`
+  - Respuesta 200:
+    ```json
+    [
+      { "idCotizacion": "COT-01", "nombreProveedor": "Sodimac", "nombreMaterial": "Placa Drywall 9mm", "precioMaterial": 32.50, "enlaceCompra": "https://sodimac.falabella.com.pe/..." }
+    ]
+    ```
 
 ## Autenticación
 - `POST /auth/login`

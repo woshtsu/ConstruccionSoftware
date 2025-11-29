@@ -38,6 +38,26 @@ public class CotizacionDao {
         return list;
     }
 
+    public java.util.List<com.example.demo_api.dto.CotizacionComparacionDTO> listarTodas() throws SQLException {
+        java.util.List<com.example.demo_api.dto.CotizacionComparacionDTO> list = new java.util.ArrayList<>();
+        String sql = "SELECT idCotizacion, nombreProveedor, nombreMaterial, precioMaterial, enlaceCompra FROM Cotizacion ORDER BY ultimaFechaActualizada DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    com.example.demo_api.dto.CotizacionComparacionDTO dto = new com.example.demo_api.dto.CotizacionComparacionDTO();
+                    dto.setIdCotizacion(rs.getString("idCotizacion"));
+                    dto.setNombreProveedor(rs.getString("nombreProveedor"));
+                    dto.setNombreMaterial(rs.getString("nombreMaterial"));
+                    dto.setPrecioMaterial(rs.getBigDecimal("precioMaterial"));
+                    dto.setEnlaceCompra(rs.getString("enlaceCompra"));
+                    list.add(dto);
+                }
+            }
+        }
+        return list;
+    }
+
     public int actualizarPrecio(String idCotizacion, java.math.BigDecimal precio) throws SQLException {
         String sql = "UPDATE Cotizacion SET precioMaterial = ?, ultimaFechaActualizada = GETDATE() WHERE idCotizacion = ?";
         try (Connection conn = dataSource.getConnection();

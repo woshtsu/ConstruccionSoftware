@@ -62,4 +62,9 @@ public class CotizacionController {
         }
         return ResponseEntity.badRequest().body(resp);
     }
+
+    @GetMapping(path = "/cotizaciones", produces = MediaType.APPLICATION_JSON_VALUE)
+    public java.util.List<com.example.demo_api.dto.CotizacionComparacionDTO> listar() {
+        return cotizacionService.listarTodas();
+    }
 }
