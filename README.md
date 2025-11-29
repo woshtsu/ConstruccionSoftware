@@ -12,6 +12,87 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
 - Desarrollo: `mvn spring-boot:run`
 - Puerto alternativo: `mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8081`
 
+## Guía de Endpoints
+- Proyectos
+  - Propósito: crear, listar, buscar, obtener y eliminar proyectos
+  - Crear: `POST /proyectos`
+    - Request:
+      ```json
+      { "idCliente": "USU-01", "titulo": "Remodelación", "descripcion": "Pared drywall", "idAsesor": null }
+      ```
+    - Response 201:
+      ```json
+      { "estado": "Exito", "idProyectoGenerado": "PROY-01" }
+      ```
+  - Obtener: `GET /proyectos/{id}`
+    - Response 200:
+      ```json
+      { "idProyecto": "PROY-01", "idServicio": "SERV-01", "idReporte": null, "titulo": "Remodelación", "descripcion": "Pared drywall", "fechaCreacion": "2025-11-25T14:00:00Z" }
+      ```
+  - Listar: `GET /proyectos`
+  - Buscar por persona: `GET /proyectos/buscar?nombre=Juan`
+  - Eliminar: `DELETE /proyectos/{id}` → 200 `{ "estado": "Exito" }`
+
+- Áreas
+  - Propósito: registrar y obtener áreas de construcción
+  - Crear: `POST /areas`
+    - Request:
+      ```json
+      { "idProyecto": "PROY-01", "tipo": "Muro Divisorio", "largo": 5.0, "alto": 2.5, "espesor": 0.12, "superficie": 12.5, "archivoImportado": null }
+      ```
+    - Response 201:
+      ```json
+      { "estado": "Exito", "idAreaConstruccion": "AREA-01" }
+      ```
+  - Obtener: `GET /areas/{id}`
+  - Listar por proyecto: `GET /proyectos/{id}/areas`
+
+- Proformas
+  - Propósito: crear y consultar proformas y sus detalles
+  - Crear: `POST /proformas` → 201 `{ "estado": "Exito", "idProforma": "PROF-01" }`
+  - Obtener: `GET /proformas/{id}`
+  - Agregar detalle: `POST /proformas/detalles`
+    - Request:
+      ```json
+      { "idProforma": "PROF-01", "idCotizacion": "COT-01", "idAreaConstruccion": "AREA-01", "cantidad": 10 }
+      ```
+    - Response 201:
+      ```json
+      { "estado": "Exito", "idMaterialProforma": "MP-001", "costoTotalActualizado": 255.0 }
+      ```
+  - Listar detalles: `GET /proformas/{id}/detalles`
+  - Eliminar: `DELETE /proformas/{id}` → 200 `{ "estado": "Exito" }`
+
+- Cotizaciones
+  - Propósito: comparar precios, actualizar precio vía scraping y crear cotizaciones
+  - Comparar por material: `GET /materiales/{id}/cotizaciones`
+  - Actualizar precio: `PUT /cotizaciones/{id}/precio`
+    - Request:
+      ```json
+      { "url": "https://www.falabella.com.pe/falabella-pe/product/XXXX" }
+      ```
+  - Crear: `POST /cotizaciones`
+    - Request:
+      ```json
+      { "idMaterial": "MAT-01", "nombreProveedor": "Proveedor SA", "nombreMaterial": "Placa Drywall 9mm", "precioMaterial": 25.5, "enlaceCompra": "https://..." }
+      ```
+
+- Búsqueda (Scraping)
+  - Propósito: buscar materiales en Falabella y registrar en `Material`
+  - Buscar: `GET /buscar?query=placa+drywall`
+    - Response 200 (lista con `idMaterial`, `titulo`, `precio`, `url`)
+
+- Autenticación
+  - Login: `POST /auth/login`
+  - Logout: `POST /auth/logout`
+  - Uso de token: crear proyecto sin `idCliente` explícito
+
+- Personas
+  - Listar: `GET /personas`
+
+- Reportes
+  - Listar por persona: `GET /personas/{id}/reportes`
+
 ## Salud
 - `GET /hola`
   - Respuesta 200:
@@ -146,12 +227,24 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
     ```
   - 400 si no se puede extraer precio o no existe la cotización
 
+- `POST /cotizaciones`
+  - Body:
+    ```json
+    { "idMaterial": "MAT-01", "nombreProveedor": "Proveedor SA", "nombreMaterial": "Placa Drywall 9mm", "precioMaterial": 25.5, "enlaceCompra": "https://..." }
+    ```
+  - Respuesta 201:
+    ```json
+    { "estado": "Exito", "idCotizacion": "COT-XX" }
+    ```
+  - 400 si campos inválidos
+
 ## Búsqueda (Scraping)
 - `GET /buscar?query=placa+drywall`
   - Respuesta 200 (lista):
     ```json
-    [ { "titulo": "Placa Drywall 9mm", "precio": 25.5, "url": "https://www.falabella.com.pe/falabella-pe/product/XXXX" } ]
+    [ { "idMaterial": "MAT-XX", "titulo": "Placa Drywall 9mm", "precio": 25.5, "url": "https://www.falabella.com.pe/falabella-pe/product/XXXX" } ]
     ```
+  - Nota: los materiales encontrados se registran en la tabla `Material` y devuelven `idMaterial` para que el frontend pueda operar (por ejemplo, crear cotizaciones con `idMaterial`).
 
 ## Autenticación
 - `POST /auth/login`

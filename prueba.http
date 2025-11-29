@@ -60,17 +60,19 @@ GET http://localhost:8080/api/v1/areas/AREA-01
 GET http://localhost:8080/api/v1/proformas/PROF-01
 
 ### Listar detalles de proforma
-GET http://localhost:8080/api/v1/proformas/PROF-01/detalles
+GET http://localhost:8080/api/v1/proformas/E5357D4D-BB49-4318-BA9B-130D54B49598/detalles
 
 ### Agregar detalle correcto (misma proforma y área del mismo proyecto)
 POST http://localhost:8080/api/v1/proformas/detalles
 Content-Type: application/json
 
 {
-  "idProforma": "PROF-01",
+  "idProforma": "E5357D4D-BB49-4318-BA9B-130D54B49598",
   "idCotizacion": "COT-01",
-  "idAreaConstruccion": "AREA-01",
-  "cantidad": 10
+  "idAreaConstruccion": "C125F7D1-2CB1-4CCE-A356-37E515021EA3",
+  "cantidad": 10,
+  "precioUnitario": 123.9,
+  "subtotal": 123.00
 }
 
 ### Agregar detalle inválido (violación de trigger)

@@ -15,6 +15,12 @@ public class ScraperService {
     private static final String UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
     private static final int TIMEOUT_MS = 7000;
 
+    private final com.example.demo_api.dao.MaterialDao materialDao;
+
+    public ScraperService(com.example.demo_api.dao.MaterialDao materialDao) {
+        this.materialDao = materialDao;
+    }
+
     public Document obtenerDocumento(String url) throws Exception {
         return Jsoup.connect(url)
                 .userAgent(UA)
@@ -94,7 +100,24 @@ public class ScraperService {
             if (a == null) {
                 a = t.parent() != null ? t.parent().selectFirst("a[href]") : null;
             }
-            dto.setUrl(a != null ? a.absUrl("href") : null);
+            if (a == null) {
+                Element container2 = t.parent();
+                for (int i = 0; i < 6 && container2 != null && a == null; i++) {
+                    a = container2.selectFirst("a[href]");
+                    container2 = container2.parent();
+                }
+            }
+            if (a == null) {
+                a = doc.selectFirst("a[href*=/product/]");
+            }
+            String enlace = a != null ? a.absUrl("href") : null;
+            dto.setUrl(enlace);
+            if (dto.getTitulo() != null && !dto.getTitulo().isBlank()) {
+                try {
+                    String idMat = materialDao.registrarSiNoExiste(dto.getTitulo());
+                    dto.setIdMaterial(idMat);
+                } catch (Exception ignore) {}
+            }
             list.add(dto);
         }
         return list;

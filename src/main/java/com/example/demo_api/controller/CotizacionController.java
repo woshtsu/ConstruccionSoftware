@@ -45,4 +45,21 @@ public class CotizacionController {
             return ResponseEntity.badRequest().body(new com.example.demo_api.dto.ActualizarPrecioResponse("Error", e.getMessage(), id, null));
         }
     }
+
+    @PostMapping(path = "/cotizaciones", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<com.example.demo_api.dto.CrearCotizacionResponse> crear(@RequestBody com.example.demo_api.dto.CrearCotizacionRequest request) {
+        boolean invalid = request.getIdMaterial() == null || request.getIdMaterial().isBlank()
+                || request.getNombreProveedor() == null || request.getNombreProveedor().isBlank()
+                || request.getNombreMaterial() == null || request.getNombreMaterial().isBlank()
+                || request.getPrecioMaterial() == null || request.getPrecioMaterial().signum() <= 0
+                || request.getEnlaceCompra() == null || request.getEnlaceCompra().isBlank();
+        if (invalid) {
+            return ResponseEntity.badRequest().body(new com.example.demo_api.dto.CrearCotizacionResponse("Error", null, "Campos inválidos"));
+        }
+        var resp = cotizacionService.crear(request);
+        if (resp != null && "Exito".equalsIgnoreCase(resp.getEstado())) {
+            return ResponseEntity.status(201).body(resp);
+        }
+        return ResponseEntity.badRequest().body(resp);
+    }
 }

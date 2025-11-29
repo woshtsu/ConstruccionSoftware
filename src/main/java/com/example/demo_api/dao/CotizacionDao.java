@@ -47,4 +47,23 @@ public class CotizacionDao {
             return ps.executeUpdate();
         }
     }
+
+    public String crear(String idMaterial, String nombreProveedor, String nombreMaterial, java.math.BigDecimal precioMaterial, String enlaceCompra) throws SQLException {
+        String sql = "INSERT INTO Cotizacion (idCotizacion, idMaterial, nombreProveedor, nombreMaterial, precioMaterial, enlaceCompra, ultimaFechaActualizada) OUTPUT inserted.idCotizacion VALUES (NEWID(), ?, ?, ?, ?, ?, GETDATE())";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, idMaterial);
+            ps.setString(2, nombreProveedor);
+            ps.setString(3, nombreMaterial);
+            ps.setBigDecimal(4, precioMaterial);
+            ps.setString(5, enlaceCompra);
+            boolean hasResult = ps.execute();
+            if (hasResult) {
+                try (ResultSet rs = ps.getResultSet()) {
+                    if (rs.next()) return rs.getString(1);
+                }
+            }
+            throw new SQLException("Sin resultado en inserción de cotizacion");
+        }
+    }
 }

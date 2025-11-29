@@ -28,4 +28,19 @@ public class CotizacionService {
             return 0;
         }
     }
+
+    public com.example.demo_api.dto.CrearCotizacionResponse crear(com.example.demo_api.dto.CrearCotizacionRequest request) {
+        try {
+            String id = cotizacionDao.crear(
+                    request.getIdMaterial(),
+                    request.getNombreProveedor(),
+                    request.getNombreMaterial(),
+                    request.getPrecioMaterial(),
+                    request.getEnlaceCompra()
+            );
+            return new com.example.demo_api.dto.CrearCotizacionResponse("Exito", id, null);
+        } catch (Exception e) {
+            return new com.example.demo_api.dto.CrearCotizacionResponse("Error", null, e.getMessage());
+        }
+    }
 }
