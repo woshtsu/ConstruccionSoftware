@@ -36,6 +36,8 @@ INSERT INTO Persona (idUsuario, nombre, email, password, contacto, tipoPersona) 
 ('USU-01', 'Juan Perez', 'juan@gmail.com', 'pass123', '987654321', 'NATURAL'),
 ('USU-02', 'Constructora SAC', 'contacto@cons.com', 'pass123', '01234567', 'EMPRESA');
 
+insert into Persona (idUsuario, nombre, email, password, contacto, tipoPersona) VALUES ('ADM-01','admin1','admin@drywallpro.com', 'admin123','00000','NATURAL');
+
 -- Insertamos en las tablas hijas (Herencia)
 INSERT INTO PersonaNatural (idUsuario, dni) VALUES ('USU-01', '70123456');
 INSERT INTO Empresa (idUsuario, ruc, direccion) VALUES ('USU-02', '20123456789', 'Av. Central 123');

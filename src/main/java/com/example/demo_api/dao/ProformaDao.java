@@ -68,4 +68,23 @@ public class ProformaDao {
         }
         return null;
     }
+
+    public int eliminarPorId(String idProforma) throws SQLException {
+        try (Connection conn = dataSource.getConnection()) {
+            boolean prev = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps1 = conn.prepareStatement("DELETE FROM MaterialProforma WHERE idProforma = ?")) {
+                ps1.setString(1, idProforma);
+                ps1.executeUpdate();
+            }
+            int affected;
+            try (PreparedStatement ps2 = conn.prepareStatement("DELETE FROM Proforma WHERE idProforma = ?")) {
+                ps2.setString(1, idProforma);
+                affected = ps2.executeUpdate();
+            }
+            conn.commit();
+            conn.setAutoCommit(prev);
+            return affected;
+        }
+    }
 }

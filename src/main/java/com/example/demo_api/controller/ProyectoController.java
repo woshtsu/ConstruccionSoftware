@@ -7,7 +7,6 @@ import com.example.demo_api.service.AuthService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -56,6 +55,29 @@ public class ProyectoController {
         var dto = proyectoService.obtenerPorId(id);
         if (dto == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping(path = "/proyectos/buscar", produces = MediaType.APPLICATION_JSON_VALUE)
+    public java.util.List<com.example.demo_api.dto.ProyectoDTO> buscarPorNombrePersona(@RequestParam("nombre") String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            return java.util.List.of();
+        }
+        return proyectoService.buscarPorNombrePersona(nombre);
+    }
+
+    @GetMapping(path = "/proyectos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public java.util.List<com.example.demo_api.dto.ProyectoDTO> listarTodos() {
+        return proyectoService.listarTodos();
+    }
+
+    @DeleteMapping(path = "/proyectos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<java.util.Map<String, String>> eliminar(@PathVariable("id") String id) {
+        if (id == null || id.isBlank()) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("estado", "Error", "mensaje", "id es requerido"));
+        }
+        boolean ok = proyectoService.eliminarPorId(id);
+        if (ok) return ResponseEntity.ok(java.util.Map.of("estado", "Exito"));
+        return ResponseEntity.notFound().build();
     }
 
     private String parseBearer(String authorization) {

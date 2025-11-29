@@ -34,4 +34,28 @@ public class ProyectoService {
             return null;
         }
     }
+
+    public java.util.List<com.example.demo_api.dto.ProyectoDTO> buscarPorNombrePersona(String nombre) {
+        try {
+            return proyectoDao.buscarPorNombrePersona(nombre);
+        } catch (Exception e) {
+            return java.util.List.of();
+        }
+    }
+
+    public java.util.List<com.example.demo_api.dto.ProyectoDTO> listarTodos() {
+        try {
+            return proyectoDao.listarTodos();
+        } catch (Exception e) {
+            return java.util.List.of();
+        }
+    }
+
+    public boolean eliminarPorId(String idProyecto) {
+        try {
+            return proyectoDao.eliminarPorId(idProyecto) > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

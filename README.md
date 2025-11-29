@@ -50,6 +50,28 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
     [ { "idProforma": "PROF-01", "idProyecto": "PROY-01", "fecha": "2025-11-25T14:00:00Z", "costoTotal": 0.0 } ]
     ```
 
+### Listado y búsqueda
+- `GET /proyectos`
+  - Respuesta 200 (lista):
+    ```json
+    [ { "idProyecto": "PROY-01", "idServicio": "SERV-01", "idReporte": null, "titulo": "Remodelación", "descripcion": "Pared drywall", "fechaCreacion": "2025-11-25T14:00:00Z" } ]
+    ```
+
+- `GET /proyectos/buscar?nombre=Juan`
+  - Respuesta 200 (lista):
+    ```json
+    [ { "idProyecto": "PROY-02", "idServicio": "SERV-02", "idReporte": null, "titulo": "División oficina", "descripcion": "Muro drywall", "fechaCreacion": "2025-11-26T10:30:00Z" } ]
+    ```
+  - Observación: filtra proyectos según `Persona.nombre` asociado al cliente del servicio.
+
+- `DELETE /proyectos/{id}`
+  - Respuesta 200:
+    ```json
+    { "estado": "Exito" }
+    ```
+  - 404 si no existe
+  - Comportamiento: elimina áreas, proformas y sus detalles, luego el proyecto.
+
 ## Áreas
 - `POST /areas`
   - Body:
@@ -131,6 +153,61 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
     [ { "titulo": "Placa Drywall 9mm", "precio": 25.5, "url": "https://www.falabella.com.pe/falabella-pe/product/XXXX" } ]
     ```
 
+## Autenticación
+- `POST /auth/login`
+  - Body:
+    ```json
+    { "email": "juan@gmail.com", "password": "pass123" }
+    ```
+  - Respuesta 200:
+    ```json
+    { "estado": "Exito", "token": "<uuid>", "idCliente": "USU-01" }
+    ```
+  - 401 si credenciales inválidas
+
+- `POST /auth/logout`
+  - Header:
+    - `Authorization: Bearer <token>`
+  - Respuesta 200:
+    ```json
+    { "estado": "Exito" }
+    ```
+  - 400 si token inválido o faltante
+
+### Uso del token
+- Crear proyecto con token (sin `idCliente` explícito):
+  - Request:
+    - Header: `Authorization: Bearer <token>`
+    - Body:
+      ```json
+      { "titulo": "Nuevo Proyecto", "descripcion": "Pared drywall", "idAsesor": null }
+      ```
+  - Respuesta 201:
+    ```json
+    { "estado": "Exito", "idProyectoGenerado": "PROY-XX" }
+    ```
+
+## Personas
+- `GET /personas`
+  - Respuesta 200 (lista):
+    ```json
+    [ { "idUsuario": "USU-01", "nombre": "Juan Pérez", "email": "juan@correo.com", "contacto": "+51 999 999 999", "tipoPersona": "Cliente" } ]
+    ```
+
+## Reportes
+- `GET /personas/{id}/reportes`
+  - Respuesta 200 (lista):
+    ```json
+    [ { "idReporte": "REP-01", "fecha": "2025-11-27T08:00:00Z", "tipoFormato": "PDF" } ]
+    ```
+  - Observación: lista reportes asociados a los proyectos del cliente (`Servicio.idCliente = {id}`).
+
+## CORS
+- Permitido origen `http://localhost:3000`, métodos `GET, POST, PUT, DELETE, OPTIONS`, headers `*`, credenciales habilitadas.
+
+## Consideraciones de sesión
+- Los tokens se almacenan en memoria para desarrollo. Reiniciar el servidor invalida los tokens existentes.
+
 ## Reglas Clave
 - Trigger de integridad en BD: impide cruzar áreas de un proyecto con proformas de otro.
 - Snapshot de precio: `MaterialProforma` guarda `idCotizacion` y `subtotal`; si el precio cambia luego en `Cotizacion`, el histórico se mantiene.
@@ -139,3 +216,11 @@ Breve documentación de la API del backend en Spring Boot para proyectos de cons
 ## Notas
 - Autenticación: no aplicable en esta versión.
 - Errores: los endpoints devuelven 400 para validaciones y reglas de negocio, 404 para no encontrado, 201 para creación y 200 para lecturas/actualizaciones.
+-
+- `DELETE /proformas/{id}`
+  - Respuesta 200:
+    ```json
+    { "estado": "Exito" }
+    ```
+  - 404 si no existe
+  - Comportamiento: elimina detalles (`MaterialProforma`) y luego la proforma.

@@ -57,4 +57,14 @@ public class ProformaController {
     public java.util.List<com.example.demo_api.dto.MaterialProformaDTO> listarDetalles(@PathVariable("id") String id) {
         return materialProformaService.listarPorProforma(id);
     }
+
+    @DeleteMapping(path = "/proformas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<java.util.Map<String, String>> eliminar(@PathVariable("id") String id) {
+        if (id == null || id.isBlank()) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("estado", "Error", "mensaje", "id es requerido"));
+        }
+        boolean ok = proformaService.eliminarPorId(id);
+        if (ok) return ResponseEntity.ok(java.util.Map.of("estado", "Exito"));
+        return ResponseEntity.notFound().build();
+    }
 }

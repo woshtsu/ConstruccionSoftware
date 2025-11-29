@@ -37,4 +37,12 @@ public class ProformaService {
             return null;
         }
     }
+
+    public boolean eliminarPorId(String idProforma) {
+        try {
+            return proformaDao.eliminarPorId(idProforma) > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -97,3 +97,15 @@ Content-Type: application/json
 
 ### Buscar productos en Falabella por término
 GET http://localhost:8080/api/v1/buscar?query=placa+drywall
+
+### Buscar proyectos por nombre de Persona
+GET http://localhost:8080/api/v1/proyectos/buscar?nombre=Juan
+
+### Listar todos los proyectos
+GET http://localhost:8080/api/v1/proyectos
+
+### Listar todas las personas
+GET http://localhost:8080/api/v1/personas
+
+### Listar reportes por id de Persona
+GET http://localhost:8080/api/v1/personas/USU-01/reportes
