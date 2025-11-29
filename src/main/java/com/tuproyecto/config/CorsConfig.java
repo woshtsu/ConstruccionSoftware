@@ -10,13 +10,16 @@ import io.micrometer.common.lang.NonNull;
 @Configuration
 public class CorsConfig {
 
+    private static final String[] ORIGINS_ALLOWED = {"http://localhost:3000", 
+    "http://localhost:3001","http://localhost:3002"};
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins(ORIGINS_ALLOWED)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
