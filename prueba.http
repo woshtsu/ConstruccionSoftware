@@ -27,7 +27,7 @@ POST http://localhost:8080/api/v1/areas
 Content-Type: application/json
 
 {
-  "idProyecto": "PROY-01",
+  "idProyecto": "04463e41-0f4e-47ac-8d5f-0c6de75035c8",
   "tipo": "Muro Divisorio",
   "largo": 5.00,
   "alto": 2.50,
@@ -41,17 +41,17 @@ POST http://localhost:8080/api/v1/proformas
 Content-Type: application/json
 
 {
-  "idProyecto": "PROY-01"
+  "idProyecto": "04463e41-0f4e-47ac-8d5f-0c6de75035c8"
 }
 
 ### Obtener proyecto por ID
 GET http://localhost:8080/api/v1/proyectos/PROY-01
 
 ### Listar áreas por proyecto
-GET http://localhost:8080/api/v1/proyectos/126AA307-0B4A-49A5-99BB-953B0F0F228C/areas
+GET http://localhost:8080/api/v1/proyectos/FD41B80A-3269-4885-90E9-18EB967C9F37/areas
 
 ### Listar proformas por proyecto
-GET http://localhost:8080/api/v1/proyectos/PROY-01/proformas
+GET http://localhost:8080/api/v1/proyectos/04463e41-0f4e-47ac-8d5f-0c6de75035c8/proformas
 
 ### Obtener área por ID
 GET http://localhost:8080/api/v1/areas/AREA-01
@@ -60,7 +60,7 @@ GET http://localhost:8080/api/v1/areas/AREA-01
 GET http://localhost:8080/api/v1/proformas/PROF-01
 
 ### Listar detalles de proforma
-GET http://localhost:8080/api/v1/proformas/E5357D4D-BB49-4318-BA9B-130D54B49598/detalles
+GET http://localhost:8080/api/v1/proformas/da31bba8-3e41-4fba-aca4-02bc0fb274a5/detalles
 
 ### Agregar detalle correcto (misma proforma y área del mismo proyecto)
 POST http://localhost:8080/api/v1/proformas/detalles

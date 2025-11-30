@@ -12,27 +12,29 @@ public class Proforma {
     @Column(name = "idProforma", length = 50)
     private String idProforma;
 
-    @Column(name = "idAreaConstruccion", length = 50, nullable = false)
-    private String idAreaConstruccion;
+    @ManyToOne
+    @JoinColumn(name = "idProyecto", nullable = false)
+    private Proyecto proyecto;
 
-    @Column(name = "precioTotal", precision = 12, scale = 2)
-    private BigDecimal precioTotal;
+    @Column(name = "costoTotal", precision = 18, scale = 2)
+    private BigDecimal costoTotal;
 
     @Column(name = "fechaCreacion")
     private LocalDateTime fechaCreacion;
 
     @OneToMany(mappedBy = "proforma", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetalleProforma> detalles;
+    private List<MaterialProforma> materiales;
 
     // Constructores
     public Proforma() {
         this.fechaCreacion = LocalDateTime.now();
+        this.costoTotal = BigDecimal.ZERO;
     }
 
-    public Proforma(String idProforma, String idAreaConstruccion, BigDecimal precioTotal) {
+    public Proforma(String idProforma, Proyecto proyecto, BigDecimal costoTotal) {
         this.idProforma = idProforma;
-        this.idAreaConstruccion = idAreaConstruccion;
-        this.precioTotal = precioTotal;
+        this.proyecto = proyecto;
+        this.costoTotal = costoTotal;
         this.fechaCreacion = LocalDateTime.now();
     }
 
@@ -40,15 +42,15 @@ public class Proforma {
     public String getIdProforma() { return idProforma; }
     public void setIdProforma(String idProforma) { this.idProforma = idProforma; }
 
-    public String getIdAreaConstruccion() { return idAreaConstruccion; }
-    public void setIdAreaConstruccion(String idAreaConstruccion) { this.idAreaConstruccion = idAreaConstruccion; }
+    public Proyecto getProyecto() { return proyecto; }
+    public void setProyecto(Proyecto proyecto) { this.proyecto = proyecto; }
 
-    public BigDecimal getPrecioTotal() { return precioTotal; }
-    public void setPrecioTotal(BigDecimal precioTotal) { this.precioTotal = precioTotal; }
+    public BigDecimal getCostoTotal() { return costoTotal; }
+    public void setCostoTotal(BigDecimal costoTotal) { this.costoTotal = costoTotal; }
 
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
 
-    public List<DetalleProforma> getDetalles() { return detalles; }
-    public void setDetalles(List<DetalleProforma> detalles) { this.detalles = detalles; }
+    public List<MaterialProforma> getMateriales() { return materiales; }
+    public void setMateriales(List<MaterialProforma> materiales) { this.materiales = materiales; }
 }

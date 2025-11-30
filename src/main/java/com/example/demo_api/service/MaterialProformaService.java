@@ -1,8 +1,11 @@
 package com.example.demo_api.service;
 
-import com.example.demo_api.model.DetalleProforma;
+import com.example.demo_api.model.MaterialProforma;
+import com.example.demo_api.model.Cotizacion;
+import com.example.demo_api.model.Proforma;
 import com.example.demo_api.repository.ProformaRepository;
 import com.example.demo_api.repository.CotizacionRepository;
+import com.example.demo_api.repository.MaterialProformaRepository;
 import com.example.demo_api.dto.AgregarDetalleProformaRequest;
 import com.example.demo_api.dto.AgregarDetalleProformaResponse;
 import org.springframework.stereotype.Service;
@@ -13,10 +16,12 @@ import java.util.UUID;
 public class MaterialProformaService {
     private final CotizacionRepository cotizacionRepository;
     private final ProformaRepository proformaRepository;
+    private final MaterialProformaRepository materialProformaRepository;
 
-    public MaterialProformaService(CotizacionRepository cotizacionRepository, ProformaRepository proformaRepository) {
+    public MaterialProformaService(CotizacionRepository cotizacionRepository, ProformaRepository proformaRepository, MaterialProformaRepository materialProformaRepository) {
         this.cotizacionRepository = cotizacionRepository;
         this.proformaRepository = proformaRepository;
+        this.materialProformaRepository = materialProformaRepository;
     }
 
     public AgregarDetalleProformaResponse agregar(AgregarDetalleProformaRequest request) {
@@ -32,22 +37,23 @@ public class MaterialProformaService {
             java.math.BigDecimal subtotal = cotizacion.get().getPrecioMaterial()
                     .multiply(request.getCantidad());
             
-            DetalleProforma detalle = new DetalleProforma(
+            MaterialProforma detalle = new MaterialProforma(
                     idDetalle,
                     proforma.get(),
-                    request.getIdCotizacion(),
+                    cotizacion.get(),
                     request.getCantidad(),
                     subtotal
             );
 
-            // Actualizar el precio total de la proforma
-            proforma.get().setPrecioTotal(
-                    proforma.get().getPrecioTotal().add(subtotal)
+                // Actualizar el costo total de la proforma
+                materialProformaRepository.save(detalle);
+                proforma.get().setCostoTotal(
+                    proforma.get().getCostoTotal().add(subtotal)
             );
             
             proformaRepository.save(proforma.get());
             
-            return new AgregarDetalleProformaResponse("Exito", null, idDetalle, proforma.get().getPrecioTotal());
+            return new AgregarDetalleProformaResponse("Exito", null, idDetalle, proforma.get().getCostoTotal());
         } catch (Exception e) {
             return new AgregarDetalleProformaResponse("Error", e.getMessage(), null, null);
         }
@@ -59,13 +65,13 @@ public class MaterialProformaService {
             if (proforma.isEmpty()) {
                 return java.util.List.of();
             }
-            return proforma.get().getDetalles()
+            return proforma.get().getMateriales()
                     .stream()
                     .map(detalle -> {
                         var dto = new com.example.demo_api.dto.MaterialProformaDTO();
-                        dto.setIdMaterialProforma(detalle.getIdDetalleProforma());
+                        dto.setIdMaterialProforma(detalle.getIdMaterialProforma());
                         dto.setIdProforma(detalle.getProforma().getIdProforma());
-                        dto.setIdCotizacion(detalle.getIdCotizacion());
+                        dto.setIdCotizacion(detalle.getCotizacion().getIdCotizacion());
                         dto.setCantidad(detalle.getCantidad());
                         dto.setSubtotal(detalle.getSubtotal());
                         return dto;
