@@ -1,7 +1,5 @@
 package com.example.demo_api.dto;
 
-import java.math.BigDecimal;
-
 public class ProductoListadoDTO {
     private String idMaterial;
     private String titulo;

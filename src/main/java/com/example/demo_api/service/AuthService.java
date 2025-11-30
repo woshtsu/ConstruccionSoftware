@@ -1,6 +1,6 @@
 package com.example.demo_api.service;
 
-import com.example.demo_api.dao.UsuarioDao;
+import com.example.demo_api.repository.PersonaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -9,20 +9,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AuthService {
-    private final UsuarioDao usuarioDao;
+    private final PersonaRepository personaRepository;
     private final Map<String, String> tokenStore = new ConcurrentHashMap<>();
 
-    public AuthService(UsuarioDao usuarioDao) {
-        this.usuarioDao = usuarioDao;
+    public AuthService(PersonaRepository personaRepository) {
+        this.personaRepository = personaRepository;
     }
 
     public com.example.demo_api.dto.LoginResponse login(com.example.demo_api.dto.LoginRequest request) {
         try {
-            String id = usuarioDao.autenticar(request.getEmail(), request.getPassword());
-            if (id != null) {
+            var persona = personaRepository.findByEmail(request.getEmail());
+            if (persona.isPresent() && persona.get().getPassword().equals(request.getPassword())) {
                 String token = UUID.randomUUID().toString();
-                tokenStore.put(token, id);
-                return new com.example.demo_api.dto.LoginResponse("Exito", null, token, id);
+                tokenStore.put(token, persona.get().getIdUsuario());
+                return new com.example.demo_api.dto.LoginResponse("Exito", null, token, persona.get().getIdUsuario());
             }
             return new com.example.demo_api.dto.LoginResponse("Error", "Credenciales inválidas", null, null);
         } catch (Exception e) {

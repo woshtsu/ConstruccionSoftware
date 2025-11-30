@@ -1,21 +1,26 @@
 package com.example.demo_api.service;
 
-import com.example.demo_api.dao.ProformaDao;
+import com.example.demo_api.model.Proforma;
+import com.example.demo_api.repository.ProformaRepository;
 import com.example.demo_api.dto.CrearProformaRequest;
 import com.example.demo_api.dto.CrearProformaResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ProformaService {
-    private final ProformaDao proformaDao;
+    private final ProformaRepository proformaRepository;
 
-    public ProformaService(ProformaDao proformaDao) {
-        this.proformaDao = proformaDao;
+    public ProformaService(ProformaRepository proformaRepository) {
+        this.proformaRepository = proformaRepository;
     }
 
     public CrearProformaResponse crear(CrearProformaRequest request) {
         try {
-            String id = proformaDao.crear(request.getIdProyecto());
+            String id = UUID.randomUUID().toString();
+            Proforma proforma = new Proforma(id, request.getIdProyecto(), java.math.BigDecimal.ZERO);
+            proformaRepository.save(proforma);
             return new CrearProformaResponse("Exito", id, null);
         } catch (Exception e) {
             return new CrearProformaResponse("Error", null, e.getMessage());
@@ -24,7 +29,17 @@ public class ProformaService {
 
     public java.util.List<com.example.demo_api.dto.ProformaDTO> listarPorProyecto(String idProyecto) {
         try {
-            return proformaDao.listarPorProyecto(idProyecto);
+            return proformaRepository.findByIdAreaConstruccion(idProyecto)
+                    .stream()
+                    .map(proforma -> {
+                        var dto = new com.example.demo_api.dto.ProformaDTO();
+                        dto.setIdProforma(proforma.getIdProforma());
+                        dto.setIdProyecto(proforma.getIdAreaConstruccion());
+                        dto.setCostoTotal(proforma.getPrecioTotal());
+                        dto.setFecha(java.sql.Timestamp.valueOf(proforma.getFechaCreacion()));
+                        return dto;
+                    })
+                    .toList();
         } catch (Exception e) {
             return java.util.List.of();
         }
@@ -32,7 +47,16 @@ public class ProformaService {
 
     public com.example.demo_api.dto.ProformaDTO obtenerPorId(String idProforma) {
         try {
-            return proformaDao.obtenerPorId(idProforma);
+            var proforma = proformaRepository.findById(idProforma);
+            if (proforma.isEmpty()) {
+                return null;
+            }
+            var dto = new com.example.demo_api.dto.ProformaDTO();
+            dto.setIdProforma(proforma.get().getIdProforma());
+            dto.setIdProyecto(proforma.get().getIdAreaConstruccion());
+            dto.setCostoTotal(proforma.get().getPrecioTotal());
+            dto.setFecha(java.sql.Timestamp.valueOf(proforma.get().getFechaCreacion()));
+            return dto;
         } catch (Exception e) {
             return null;
         }
@@ -40,7 +64,8 @@ public class ProformaService {
 
     public boolean eliminarPorId(String idProforma) {
         try {
-            return proformaDao.eliminarPorId(idProforma) > 0;
+            proformaRepository.deleteById(idProforma);
+            return true;
         } catch (Exception e) {
             return false;
         }

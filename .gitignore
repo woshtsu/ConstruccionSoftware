@@ -20,3 +20,6 @@ Thumbs.db
 hs_err_pid*
 spring.log
 resources
+ARCHITECTURE_REFACTORING.md
+MODEL_RELATIONSHIPS.md
+REFACTORING_*.md
